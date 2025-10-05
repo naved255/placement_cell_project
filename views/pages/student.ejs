@@ -1,0 +1,66 @@
+<% layout('/layouts/boilerplate.ejs') -%>
+
+  <body>
+    <div class="bg-gray-50 min-h-screen flex flex-wrap gap-2.5 items-center justify-center py-10">
+
+      <% for(let student of result) {%>
+
+        <div class="bg-white shadow-lg rounded-2xl  w-full max-w-3xl p-8">
+
+          <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <!-- Avatar -->
+            <div class="flex-shrink-0">
+              <div
+                class="w-32 h-32 p-2.5 rounded-full bg-gradient-to-tr text-center from-indigo-500 to-purple-500 flex items-center justify-center text-white text-4xl font-semibold">
+                <p><%= student.name%></p>
+              </div>
+            </div>
+
+            <!-- Student Info -->
+            <div class="flex-1">
+              <h1 class="text-2xl font-semibold text-gray-800">
+                <%= student.name %>
+              </h1>
+              <p class="text-gray-500 mb-3">
+                <%= student.department %> Department
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                <p><span class="font-medium">Student ID:</span>
+                  <%= student.student_id %>
+                </p>
+                <p><span class="font-medium">Email:</span>
+                  <%= student.email %>
+                </p>
+                <p><span class="font-medium">CGPA:</span>
+                  <%= student.cgpa %>
+                </p>
+                <p><span class="font-medium">Year of Study:</span>
+                  <%= student.year_of_study %>
+                </p>
+                <p><span class="font-medium">Gender:</span>
+                  <%= student.gender %>
+                </p>
+                <p><span class="font-medium">DOB:</span>
+                  <%= new Date(student.dob).toLocaleDateString() %>
+                </p>
+                <p class="sm:col-span-2"><span class="font-medium">Address:</span>
+                  <%= student.address %>
+                </p>
+                <p class="sm:col-span-2"><span class="font-medium">Contact:</span>
+                  <%= student.contact_no %>
+                </p>
+              </div>
+
+              <!-- Resume -->
+              <div class="mt-6">
+                <a href="/uploads/<%= student.resume_link %>"
+                  class="inline-block px-5 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition">
+                  View Resume
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <%}%>
+    </div>
+  </body>
