@@ -8,7 +8,7 @@ export default function CompanyDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Sample data (replace with API calls)
+   
     setJobs([
       { id: 1, title: "Frontend Developer", deadline: "2025-11-15", applications: 5 },
       { id: 2, title: "Backend Developer", deadline: "2025-11-20", applications: 3 },
@@ -31,7 +31,7 @@ export default function CompanyDashboard() {
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold text-green-700">Company Dashboard</h1>
 
-      {/* Summary Cards */}
+   
       <div className="grid md:grid-cols-3 gap-6">
         <div className="bg-white shadow rounded-lg p-6 text-center">
           <h2 className="text-lg font-semibold text-green-600">Total Jobs Posted</h2>
@@ -51,7 +51,7 @@ export default function CompanyDashboard() {
         </div>
       </div>
 
-      {/* Recent Jobs */}
+      
       <section className="bg-white shadow rounded-lg p-6">
         <h2 className="text-2xl font-semibold text-green-600 mb-4">Recent Jobs</h2>
         <div className="space-y-4">
@@ -67,7 +67,7 @@ export default function CompanyDashboard() {
         </div>
       </section>
 
-      {/* Notifications */}
+ 
       <section className="bg-white shadow rounded-lg p-6">
         <h2 className="text-2xl font-semibold text-green-600 mb-4">Notifications</h2>
         <ul className="space-y-2">

@@ -16,7 +16,7 @@ const JobPost = () => {
         console.log("Job Posted:", data);
         alert("✅ Job Posted Successfully!");
         reset();
-        // Later: Send data to your backend via fetch/axios
+      
     };
 
     return (
@@ -36,7 +36,7 @@ const JobPost = () => {
                     placeholder="Enter job title"
                 />
 
-                {/* Job Description */}
+             
                 <div>
                     <label className="block text-gray-700 font-semibold mb-2">
                         Job Description
@@ -60,7 +60,7 @@ const JobPost = () => {
                     )}
                 </div>
 
-                {/* Eligible Branches */}
+              
                 <SelectField
                     label={"Eligible Branches"}
                     name={"EligibleBranches"}
@@ -70,7 +70,7 @@ const JobPost = () => {
                     options={["Computer Engineering", "Civil Engineering", "Mechanical Engineering", "Electical Engineering", "Electronics Engineering"]}
                 />
 
-                {/* Minimum CGPA */}
+              
                 <InputField
                     label="Minimum CGPA"
                     name="minCGPA"
@@ -82,7 +82,7 @@ const JobPost = () => {
                     placeholder="e.g. 7.5"
                 />
 
-                {/* Deadline */}
+              
                 <InputField
                     label="Application Deadline"
                     name="deadline"

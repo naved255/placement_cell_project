@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function CompanyApplications() {
-  // Mock data — replace later with API data
+ 
   const [applications, setApplications] = useState([
     {
       id: 1,
@@ -42,7 +42,7 @@ export default function CompanyApplications() {
 
   return (
     <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
-      {/* Job Header */}
+    
       <div className="mb-6 border-b border-green-200 pb-4">
         <h2 className="text-3xl font-bold text-green-700">Applications for: Software Engineer Intern</h2>
         <p className="text-gray-500 mt-1">
@@ -50,7 +50,7 @@ export default function CompanyApplications() {
         </p>
       </div>
 
-      {/* Applications Table */}
+    
       <div className="overflow-x-auto">
         <table className="min-w-full border border-green-100 rounded-lg">
           <thead className="bg-green-100 text-green-800">

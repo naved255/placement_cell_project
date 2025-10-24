@@ -19,7 +19,7 @@ export default function CompanyProfile() {
   const handleSave = () => {
     setIsEditing(false);
     console.log("Updated company data:", companyData);
-    // TODO: API call to update company profile in backend
+   
   };
 
   return (
