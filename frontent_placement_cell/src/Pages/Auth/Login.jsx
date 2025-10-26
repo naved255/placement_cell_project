@@ -3,6 +3,8 @@ import InputField from "../../components/Form/InputField"
 import SelectField from "../../components/Form/SelectedField"
 import SubmitButton from "../../components/Form/SubmitButton"
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { useRef } from "react";
 
 export default function LoginPage() {
 
@@ -14,11 +16,31 @@ export default function LoginPage() {
     formState: { errors }
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("Login data:", data);
-    if (data) {
-      let a = data.user.toLowerCase()
-      navigate(`/${a}`);
+    const res = await axios.post("http://localhost:8000/login", {
+      email: data.email,
+      password: data.password,
+    }, { withCredentials: true })
+    if (res.status === 404) {
+      console.log(res.data);
+      return;
+    }
+    console.log(res.data);
+    const { role } = res.data;
+    try {
+      const checkRegister = await axios.get("http://localhost:8000/check/profile", { withCredentials: true });
+      if (role == "student") navigate("/student");
+      if (role == "company") navigate("/company");
+      if (role == "officer") navigate("/officer");
+      console.log(res.data.role);
+    }
+    catch (err) {
+      if (err.response.status === 400) {
+        navigate("/roleRegister", {
+          state: { role: role }
+        })
+      }
     }
   };
 
@@ -35,8 +57,8 @@ export default function LoginPage() {
         <InputField
           label="Email"
           name="email"
-          register={register}
           errors={errors}
+          register={register}
           placeholder="Enter your email"
           type="email"
           validation={{
@@ -52,14 +74,6 @@ export default function LoginPage() {
           errors={errors}
           placeholder="Enter your password"
           type="password"
-          validation={{ required: "Email is required" }} />
-
-        <SelectField
-          label="User"
-          name="user"
-          register={register}
-          errors={errors}
-          options={["Student", "Company", "Placement Officer"]}
           validation={{ required: "Email is required" }} />
 
         <SubmitButton >Login</SubmitButton>

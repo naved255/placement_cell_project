@@ -2,35 +2,44 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../../components/Form/InputField";
 import SubmitButton from "../../components/Form/SubmitButton";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Layout/Navbar";
+import axios from "axios";
+
+
+const UpdateProfile = async(data)=>{
+  try{
+    const res = await axios.post("http://localhost:8000/officer/update",data,{
+      withCredentials : true
+    })
+    console.log(res.data);
+  }catch(err){
+    console.log(err)
+  }
+}
 
 export default function OfficerUpdateProfile() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const {officer} = location.state;
 
   // Sample initial officer data
-  const initialData = {
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+91-9876543210",
-    designation: "Placement Officer",
-    department: "Computer Science",
-    officeRoom: "A-203",
-  };
+
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
-    defaultValues: initialData,
+    defaultValues: officer,
   });
 
   const onSubmit = (data) => {
-    console.log("Updated Officer Profile:", data);
+    UpdateProfile(data);
     alert("✅ Profile Updated Successfully!");
+    navigate("/officer/profile")
     // Here you can call your backend API to update the data
   };
 
   const handleCancel = () => {
     reset(); // Reset form to initial values
-    navigate("/placementofficer/profile"); // Navigate back to dashboard
+    navigate("/officer/profile"); // Navigate back to dashboard
   };
 
   return (
@@ -96,7 +105,7 @@ export default function OfficerUpdateProfile() {
 
           <InputField
             label="Office Room"
-            name="officeRoom"
+            name="office_room_no"
             register={register}
             errors={errors}          
              placeholder="Enter your office room number"

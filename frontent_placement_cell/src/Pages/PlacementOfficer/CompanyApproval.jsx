@@ -1,40 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReviewCard from "../../components/ReviewCard";
+import axios from 'axios';
+
+
+const fetchCompany = async()=>{
+  try{
+    const res = await axios.get("http://localhost:8000/company/get");
+    return res.data.companies;
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+
+const updateStatus = async(status,id)=>{
+    try{
+        const res = await axios.post(`http://localhost:8000/company/update/status/${id}`,{
+            status 
+        },{withCredentials : true});
+        console.log(res.data);
+    }
+    catch(err){
+        console.log(err)
+    }
+}
 
 const CompanyApproval = () => {
-  const [companies, setCompanies] = useState([
-    {
-      id: 1,
-      name: "TechNova Pvt. Ltd.",
-      email: "hr@technova.com",
-      website: "https://technova.com",
-      description: "Leading software solutions provider specializing in AI.",
-      location: "Bangalore",
-      industry: "Software",
-      status: "pending",
-    },
-    {
-      id: 2,
-      name: "GreenEdge Solutions",
-      email: "contact@greenedge.com",
-      website: "https://greenedge.com",
-      description: "Sustainable tech startup working on eco-friendly devices.",
-      location: "Delhi",
-      industry: "Clean Tech",
-      status: "pending",
-    },
-  ]);
+  const [companies, setCompanies] = useState([]);
+
+  useEffect(()=>{
+    fetchCompany().then(res=>setCompanies(res));
+    
+  },[])
 
   const handleApprove = (id) => {
-    setCompanies((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "approved" } : c))
-    );
+    updateStatus("approved",id);
   };
 
   const handleReject = (id) => {
-    setCompanies((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "rejected" } : c))
-    );
+    console.log(id);
+    updateStatus("rejected",id);
   };
 
   return (
@@ -53,15 +58,15 @@ const CompanyApproval = () => {
                 key={company.id}
                 type="company"
                 title={company.name}
-                subtitle={company.email}
-                status={company.status}
+                subtitle={company.contact_email}
+                status={company.approval_status}
                 details={[
                   { label: "Location", value: company.location },
-                  { label: "Industry", value: company.industry },
+                  { label: "Description", value: company.description },
                   { label: "Website", value: company.website },
                 ]}
-                onApprove={() => handleApprove(company.id)}
-                onReject={() => handleReject(company.id)}
+                onApprove={() => handleApprove(company.company_id)}
+                onReject={() => handleReject(company.company_id)}
               />
             ))}
           </div>

@@ -1,33 +1,30 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
+
+const fetchMyApplication = async()=>{
+  try{
+    const res = await axios.get("http://localhost:8000/application/student",{
+      withCredentials : true
+    })
+    console.log(res.data);
+    return res.data.applications;
+  }
+  catch(err){
+    console.log(err.response);
+  }
+}
 
 export default function StudentAppliedJobs() {
   const [appliedJobs, setAppliedJobs] = useState([]);
 
   useEffect(() => {
 
-    setAppliedJobs([
-      {
-        id: 1,
-        title: "Frontend Developer",
-        company: "Tech Corp",
-        appliedOn: "2025-10-20",
-        status: "Pending",
-      },
-      {
-        id: 2,
-        title: "Backend Developer",
-        company: "CodeLabs",
-        appliedOn: "2025-10-18",
-        status: "Shortlisted",
-      },
-      {
-        id: 3,
-        title: "UI/UX Designer",
-        company: "DesignHub",
-        appliedOn: "2025-10-15",
-        status: "Rejected",
-      },
-    ]);
+    fetchMyApplication()
+    .then((res)=>{
+      setAppliedJobs(res);
+    }
+    )
+
   }, []);
 
   
@@ -52,8 +49,8 @@ export default function StudentAppliedJobs() {
             >
               <div>
                 <h3 className="text-lg font-medium">{job.title}</h3>
-                <p className="text-gray-600">Company: {job.company}</p>
-                <p className="text-gray-500 text-sm">Applied On: {job.appliedOn}</p>
+                <p className="text-gray-600">Company: {job.company_name}</p>
+                <p className="text-gray-500 text-sm">Applied On: {job.created_at}</p>
               </div>
               <span
                 className={`px-3 py-1 rounded-full font-semibold text-sm ${statusColors[job.status]}`}

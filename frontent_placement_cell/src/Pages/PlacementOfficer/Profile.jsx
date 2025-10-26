@@ -1,21 +1,34 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const fetchOfficerProfile = async()=>{
+    try{
+        const res = await axios.get("http://localhost:8000/officer/profile",{
+            withCredentials:true
+        })
+        console.log(res.data.officer);
+        return res.data.officer;
+    }
+    catch(err){
+        console.log(err);
+    }
+}
 
 export default function OfficerProfile() {
     
     const navigate = useNavigate();
 
-    const [officer, setOfficer] = useState({
-        name: "John Doe",
-        email: "johndoe@example.com",
-        phone: "+91-9876543210",
-        designation: "Placement Officer",
-        department: "Computer Science",
-        officeRoom: "A-203",
-    });
+    const [officer, setOfficer] = useState({});
+
+    useEffect(()=>{
+        fetchOfficerProfile().then(res=>setOfficer(res));
+    },[])
 
     const handleEdit = () => {
-    navigate("/placementofficer/update")
+    navigate("/officer/update",{
+        state : {officer}
+    })
        
     };
 
@@ -55,7 +68,7 @@ export default function OfficerProfile() {
 
                     <div>
                         <p className="text-gray-700 font-semibold">Office Room</p>
-                        <p className="text-gray-900">{officer.officeRoom}</p>
+                        <p className="text-gray-900">{officer.office_room_no}</p>
                     </div>
                 </div>
 

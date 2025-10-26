@@ -1,58 +1,29 @@
 import { useEffect, useState } from "react";
 import ReviewCard from "../../components/ReviewCard";
+import axios from 'axios';
 
-const jobReviewData = [
-    {
-        _id: "job1",
-        title: "Software Engineer Intern",
-        companyName: "Google India Pvt. Ltd.",
-        location: "Bangalore, Karnataka",
-        minCgpa: 8.0,
-        eligibleBranches: ["CSE", "IT", "ECE"],
-        deadline: "2025-11-30",
-        description:
-            "Work with our global engineering team to develop scalable software solutions using the latest Google technologies.",
-        status: "Pending",
-    },
-    {
-        _id: "job2",
-        title: "Data Analyst",
-        companyName: "Tata Consultancy Services (TCS)",
-        location: "Pune, Maharashtra",
-        minCgpa: 7.5,
-        eligibleBranches: ["CSE", "IT", "EEE"],
-        deadline: "2025-12-05",
-        description:
-            "Analyze datasets and generate business insights for TCS clients using Python, SQL, and Power BI.",
-        status: "Approved",
-    },
-    {
-        _id: "job3",
-        title: "Hardware Design Engineer",
-        companyName: "Intel Technologies",
-        location: "Hyderabad, Telangana",
-        minCgpa: 8.5,
-        eligibleBranches: ["ECE", "EEE"],
-        deadline: "2025-11-20",
-        description:
-            "Design and test next-generation microchips and embedded systems for Intel's hardware division.",
-        status: "Pending",
-    },
-    {
-        _id: "job4",
-        title: "UI/UX Designer",
-        companyName: "Adobe Systems",
-        location: "Noida, Uttar Pradesh",
-        minCgpa: 7.0,
-        eligibleBranches: ["CSE", "IT", "Design"],
-        deadline: "2025-11-28",
-        description:
-            "Collaborate with cross-functional teams to design intuitive and beautiful interfaces for Adobe products.",
-        status: "Rejected",
-    },
-];
+const fetchJobs = async()=>{
+    try{
+        const res = await axios.get("http://localhost:8000/job/get");
+   
+        return res.data.jobs;
+    }
+    catch(err){
+        console.log(err);
+    }
+}
 
-
+const updateStatus = async(status,job_id)=>{
+    try{
+        const res = await axios.post(`http://localhost:8000/job/update/status/${job_id}`,{
+            status 
+        },{withCredentials : true});
+        console.log(res.data);
+    }
+    catch(err){
+        console.log(err)
+    }
+}
 
 export default function ReviewJobs() {
 
@@ -60,25 +31,14 @@ export default function ReviewJobs() {
 
 
     useEffect(() => {
-        async function fetchJobs() {
-            try {
-                setJobs(jobReviewData);
-            } catch (err) {
-                console.error("Failed to fetch jobs:", err);
-            }
-        }
-        fetchJobs();
+        fetchJobs().then(res=>setJobs(res))
     }, []);
 
 
     const handleApprove = async (id) => {
         try {
-           
-            setJobs((prev) =>
-                prev.map((job) =>
-                    job._id === id ? { ...job, status: "Approved" } : job
-                )
-            );
+            updateStatus("approved",id);
+
         } catch (err) {
             console.error("Approval failed:", err);
         }
@@ -87,12 +47,7 @@ export default function ReviewJobs() {
 
     const handleReject = async (id) => {
         try {
-    
-            setJobs((prev) =>
-                prev.map((job) =>
-                    job._id === id ? { ...job, status: "Rejected" } : job
-                )
-            );
+           updateStatus("rejected",id);
         } catch (err) {
             console.error("Rejection failed:", err);
         }
@@ -113,15 +68,15 @@ export default function ReviewJobs() {
                             <ReviewCard
                                 type="job"
                                 title={job.title}
-                                subtitle={job.companyName}
-                                status={job.status}
+                                subtitle={job.company_name}
+                                status={job.approval_status}
                                 details={[
                                     { label: "Location", value: job.location },
-                                    { label: "Min CGPA", value: job.minCgpa },
-                                    { label: "Deadline", value: new Date(job.deadline).toLocaleDateString() },
+                                    { label: "Min CGPA", value: job.min_cgpa },
+                                    { label: "Deadline", value: new Date(job.deadline).toLocaleString().slice(0,10) },
                                 ]}
-                                onApprove={() => handleApprove(job._id)}
-                                onReject={() => handleReject(job._id)}
+                                onApprove={() => handleApprove(job.job_id)}
+                                onReject={() => handleReject(job.job_id)}
                             />
 
                         ))}

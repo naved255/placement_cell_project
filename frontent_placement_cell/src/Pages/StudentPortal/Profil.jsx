@@ -1,29 +1,33 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+
+
+const fetchStudentProfile = async()=>{
+  try{
+    const res = await axios.get("http://localhost:8000/student/profile",
+    { withCredentials: true })
+    console.log(res);
+    return res.data.student;
+  }
+  catch(err){
+    console.log(err);
+  }
+}
 
 export default function StudentProfile() {
   const [student, setStudent] = useState({});
 
   useEffect(() => {
-    
-    setStudent({
-      name: "John Doe",
-      email: "john.doe@university.edu",
-      rollNumber: "123456",
-      cgpa: "8.7",
-      department: "Computer Science",
-      branch: "Software Engineering",
-      yearOfStudy: "3rd Year",
-      backlogStatus: "No",
-      resumeLink: "https://example.com/resume/john-doe",
-    });
+    fetchStudentProfile()
+    .then((profile)=>setStudent(profile))
   }, []);
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-green-700">My Profile</h1>
-        <NavLink to={"/student/edit"} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+        <NavLink to={"/student/edit"} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition" state={{student}}>
           Edit
         </NavLink>
       </div>
@@ -39,7 +43,7 @@ export default function StudentProfile() {
         </div>
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">Roll Number:</span>
-          <span className="text-gray-800">{student.rollNumber}</span>
+          <span className="text-gray-800">{student.roll_number}</span>
         </div>
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">CGPA:</span>
@@ -55,11 +59,11 @@ export default function StudentProfile() {
         </div>
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">Year of Study:</span>
-          <span className="text-gray-800">{student.yearOfStudy}</span>
+          <span className="text-gray-800">{student.year_of_study}</span>
         </div>
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">Backlog Status:</span>
-          <span className="text-gray-800">{student.backlogStatus}</span>
+          <span className="text-gray-800">{student.backlog_status}</span>
         </div>
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">Resume:</span>

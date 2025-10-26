@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/Card";
+import axios from "axios";
+
+const fetchCompanyJobs = async()=>{
+  try{
+    const res = await axios.get("http://localhost:8000/job/company",{
+      withCredentials : true
+    })
+    console.log(res.data.jobs);
+    return res.data.jobs;
+  }
+  catch(err){
+    console.log(err);
+  }
+
+}
 
 export default function CompanyDashboard() {
   const [jobs, setJobs] = useState([]);
@@ -8,12 +23,8 @@ export default function CompanyDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-   
-    setJobs([
-      { id: 1, title: "Frontend Developer", deadline: "2025-11-15", applications: 5 },
-      { id: 2, title: "Backend Developer", deadline: "2025-11-20", applications: 3 },
-      { id: 3, title: "UI/UX Designer", deadline: "2025-11-25", applications: 7 },
-    ]);
+
+    fetchCompanyJobs().then((res)=>setJobs(res));
 
     setNotifications([
       { id: 1, message: "Placement drive on 25th Nov", date: "2025-10-23" },
@@ -25,7 +36,7 @@ export default function CompanyDashboard() {
     navigate("/company/application");
   }
 
-  const totalApplications = jobs.reduce((acc, job) => acc + job.applications, 0);
+  // const totalApplications = jobs.reduce((acc, job) => acc + job.applications, 0);
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
@@ -39,13 +50,13 @@ export default function CompanyDashboard() {
         </div>
         <div className="bg-white shadow rounded-lg p-6 text-center">
           <h2 className="text-lg font-semibold text-green-600">Total Applications</h2>
-          <p className="text-3xl font-bold text-gray-800">{totalApplications}</p>
+          <p className="text-3xl font-bold text-gray-800">{8}</p>
         </div>
         <div className="bg-white shadow rounded-lg p-6 text-center">
           <h2 className="text-lg font-semibold text-green-600">Upcoming Deadlines</h2>
           <p className="text-3xl font-bold text-gray-800">
             {jobs
-              .map((job) => job.deadline)
+              .map((job) => (new Date(job.deadline)).toLocaleString().slice(0,10))
               .sort((a, b) => new Date(a) - new Date(b))[0]}
           </p>
         </div>
@@ -57,8 +68,8 @@ export default function CompanyDashboard() {
         <div className="space-y-4">
           {jobs.map((job) => (
             <Card
-              key={job.id}
-              date={job.deadline}
+              key={job.job_id}
+              date={(new Date(job.deadline)).toLocaleString().slice(0,10)}
               handleClick={handleClick}
               title={job.title}
               number={job.applications}

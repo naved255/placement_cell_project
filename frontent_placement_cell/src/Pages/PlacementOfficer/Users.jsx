@@ -1,50 +1,49 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import Card from '../../components/Card';
+import axios from 'axios';
+
+
+const fetchStudents = async () => {
+    try {
+        const res = await axios.get("http://localhost:8000/student/get");
+        let students = res.data.students;
+        students = students.filter((student) => {
+            return student.approval_status === "approved"
+        })
+        return students;
+
+    }
+    catch (err) {
+        console.log(err.response);
+    }
+
+}
+
+const fetchCompany = async () => {
+    try {
+        const res = await axios.get("http://localhost:8000/company/get")
+        let companies = res.data.companies;
+        companies = companies.filter((company) => {
+            return company.approval_status === "approved"
+        })
+        return companies;
+
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
 
 const Users = () => {
 
     const [students, setStudents] = useState([]);
-
-    const [companies, setCompanies] = useState([
-        {
-            id: 1,
-            name: "TechNova Pvt. Ltd.",
-            email: "hr@technova.com",
-            website: "https://technova.com",
-            description: "Leading software solutions provider specializing in AI.",
-            location: "Bangalore",
-            industry: "Software",
-            status: "pending",
-        },
-        {
-            id: 2,
-            name: "GreenEdge Solutions",
-            email: "contact@greenedge.com",
-            website: "https://greenedge.com",
-            description: "Sustainable tech startup working on eco-friendly devices.",
-            location: "Delhi",
-            industry: "Clean Tech",
-            status: "pending",
-        },
-    ]);
-
+    const [companies, setCompanies] = useState([]);
 
 
     useEffect(() => {
-        const fetchStudents = async () => {
-
-            const data = [
-                { id: 1, name: "Naved Ahmad", branch: "Computer Engineering", cgpa: 8.5, status: "Pending" },
-                { id: 2, name: "Ayesha Khan", branch: "Mechanical Engineering", cgpa: 7.9, status: "Pending" },
-                { id: 3, name: "Rahul Singh", branch: "Civil Engineering", cgpa: 8.1, status: "Approved" },
-            ];
-            setStudents(data);
-
-
-        };
-
-        fetchStudents();
+        fetchStudents().then(res => setStudents(res));
+        fetchCompany().then(res => setCompanies(res));
     }, []);
 
     return (
@@ -56,12 +55,11 @@ const Users = () => {
             <div className="overflow-x-auto flex flex-col gap-2.5">
 
 
-                {companies.map((student) => (
+                {companies.map((company) => (
                     <Card
-                        title={student.name}
-                        details={[{ lable: "Description", value: student.description }, { lable: "Industry", value: student.industry }, {lable: "Location", value: student.location}]}
+                        title={company.company_name}
+                        details={[{ lable: "Description", value: company.description }, { lable: "Contact No.", value: company.contact_no }, { lable: "website", value: company.website }]}
                     />
-
                 ))}
 
             </div>

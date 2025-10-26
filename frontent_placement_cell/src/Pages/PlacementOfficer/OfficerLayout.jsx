@@ -11,19 +11,19 @@ const OfficerLayout = () => {
 
             <Navbar links={[
                 {
-                    path: "/placementofficer",
+                    path: "/officer",
                     lable: "Dashboard"
                 },
                 {
-                    path: "/placementofficer/profile",
+                    path: "/officer/profile",
                     lable: "Profile"
                 },
                 {
-                    path: "/placementofficer/stats",
+                    path: "/officer/stats",
                     lable: "Placements"
                 },
                 {
-                    path: "/placementofficer/user/profile",
+                    path: "/officer/user/profile",
                     lable: "Users"
                 }
 

@@ -1,45 +1,52 @@
 import React, { useEffect, useState } from "react";
 import ReviewCard from "../../components/ReviewCard";
+import axios from "axios";
+
+
+const fetchStudents = async()=>{
+  try{
+    const res = await axios.get("http://localhost:8000/student/get");
+
+    return res.data.students;
+  }
+  catch(err){
+    console.log(err)
+  }
+}
+
+const updateStatus = async(status,id)=>{
+    try{
+        const res = await axios.post(`http://localhost:8000/student/update/status/${id}`,{
+            status 
+        },{withCredentials : true});
+        console.log(res.data);
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
 
 export default function StudentApproval() {
     const [students, setStudents] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     
     useEffect(() => {
-        const fetchStudents = async () => {
-        
-            const data = [
-                { id: 1, name: "Naved Ahmad", branch: "Computer Engineering", cgpa: 8.5, status: "Pending" },
-                { id: 2, name: "Ayesha Khan", branch: "Mechanical Engineering", cgpa: 7.9, status: "Pending" },
-                { id: 3, name: "Rahul Singh", branch: "Civil Engineering", cgpa: 8.1, status: "Approved" },
-            ];
-            setStudents(data);
-            setLoading(false);
-        };
+        console.log("run")
+        fetchStudents().then(res=>setStudents(res));
 
-        fetchStudents();
     }, []);
 
     const handleApprove = (id) => {
-        setStudents((prev) =>
-            prev.map((s) =>
-                s.id === id ? { ...s, status: "Approved" } : s
-            )
-        );
+        updateStatus("approved",id)
+
+       
     };
 
     const handleReject = (id) => {
-        setStudents((prev) =>
-            prev.map((s) =>
-                s.id === id ? { ...s, status: "Rejected" } : s
-            )
-        );
-    };
+        updateStatus("rejected",id);
 
-    if (loading) {
-        return <p className="text-center mt-10 text-gray-500">Loading students...</p>;
-    }
+    };
 
     return (
         <div className="max-w-5xl mx-auto mt-10 bg-white shadow-md rounded-2xl p-8">
@@ -48,23 +55,21 @@ export default function StudentApproval() {
             </h2>
 
             <div className="overflow-x-auto">
-        
                     
                         {students.map((student) => (
                             <ReviewCard
                                 type="student"
                                 title={student.name}
-                                subtitle={student.rollNumber}
-                                status={student.status}
+                                subtitle={student.roll_number}
+                                status={student.approval_status}
                                 details={[
                                     { label: "Branch", value: student.branch },
                                     { label: "CGPA", value: student.cgpa },
                                     { label: "Email", value: student.email },
                                 ]}
-                                onApprove={() => handleApprove(student.id)}
-                                onReject={() => handleReject(student.id)}
+                                onApprove={() => handleApprove(student.student_id)}
+                                onReject={() => handleReject(student.student_id)}
                             />
-
                         ))}
 
             </div>

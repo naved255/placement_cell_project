@@ -21,6 +21,7 @@ import StudentApproval from "./Pages/PlacementOfficer/StudentApproval";
 import ReviewJobs from "./Pages/PlacementOfficer/ReviewJob";
 import PlacementStats from "./Pages/PlacementOfficer/PlacementStats";
 import Students from "./Pages/PlacementOfficer/Users";
+import RoleRegisteration from "./Pages/Auth/roleRegisteration";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/roleRegister" element={<RoleRegisteration/>}/>
         
 
         <Route path="/student" element={<StudentLayout />}>
@@ -46,7 +48,7 @@ function App() {
           <Route path="jobpost" element={<CompanyJobPost/>}/>
         </Route>
 
-        <Route path="/placementofficer" element={<OfficerLayout/>}>
+        <Route path="/officer" element={<OfficerLayout/>}>
           <Route index element={<OfficerDashboard/>}/>
           <Route path="update" element={<OfficerUpdateProfile/>}/>
           <Route path="profile" element={<OfficerProfile/>}/>

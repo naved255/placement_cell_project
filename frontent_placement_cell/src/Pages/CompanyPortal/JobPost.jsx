@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import InputField from "../../components/Form/InputField";
 import SelectField from "../../components/Form/SelectedField";
+import axios from "axios";
+
+const addJobPost = async(data)=>{
+    try{
+        const res = await axios.post("http://localhost:8000/job/postJob",data,{withCredentials:true});
+        console.log(res.data);
+
+    }
+    catch(err){
+        console.log(err);
+    }
+}
 
 const JobPost = () => {
+    const [allowedBranches , setAllowedBranches] = useState([])
+    const handlesBranches = (data)=>{
+        console.log(data);
+    }
 
     const {
         register,
@@ -14,9 +30,9 @@ const JobPost = () => {
 
     const onSubmit = (data) => {
         console.log("Job Posted:", data);
+        addJobPost(data);
         alert("✅ Job Posted Successfully!");
         reset();
-      
     };
 
     return (
@@ -29,10 +45,10 @@ const JobPost = () => {
 
                 <InputField
                     label="Job Title"
-                    name="title"
+                    name="jobTitle"
                     register={register}
                     errors={errors}
-                    validation={{ required: "Email is required" }}
+                    validation={{ required: "Title is required" }}
                     placeholder="Enter job title"
                 />
 
@@ -63,8 +79,9 @@ const JobPost = () => {
               
                 <SelectField
                     label={"Eligible Branches"}
-                    name={"EligibleBranches"}
+                    name={"allowedBranches"}
                     register={register}
+                    onChange={(e)=>handlesBranches(e.target.value)}
                     errors={errors}
                     validation={{ required: "Email is required" }}
                     options={["Computer Engineering", "Civil Engineering", "Mechanical Engineering", "Electical Engineering", "Electronics Engineering"]}
@@ -73,13 +90,22 @@ const JobPost = () => {
               
                 <InputField
                     label="Minimum CGPA"
-                    name="minCGPA"
+                    name="minGpa"
                     type="number"
                     step="0.1"
                     register={register}
                     errors={errors}
                     validation={{ required: "Email is required" }}
                     placeholder="e.g. 7.5"
+                />
+                                <InputField
+                    label="Year of Study"
+                    name="yearOfStudy"
+                    type="number"
+                    register={register}
+                    errors={errors}
+                    validation={{ required: "Email is required" }}
+
                 />
 
               
@@ -100,6 +126,13 @@ const JobPost = () => {
                     errors={errors}
                     validation={{ required: "Email is required" }}
                     placeholder="e.g. Bengaluru, Remote"
+                />
+                                <InputField
+                    label="Salary Package"
+                    name="salary"
+                    register={register}
+                    errors={errors}
+                    validation={{ required: "Email is required" }}
                 />
 
                 {/* Submit Button */}

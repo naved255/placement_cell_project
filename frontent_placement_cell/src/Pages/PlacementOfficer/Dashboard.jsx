@@ -19,7 +19,7 @@ export default function OfficerDashboard() {
   const navigate = useNavigate();
 
   function handleClick(name) {
-    navigate(`/placementofficer/${name}`);
+    navigate(`/officer/${name}`);
   }
   return (
     <div className="min-h-screen bg-green-50">

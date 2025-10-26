@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
 import JobCard from "../../components/JobCard";
+import axios from "axios";
+
+const fetchJobs = async()=>{
+  try{
+    const res = await axios.get("http://localhost:8000/job/get",{withCredentials : true});
+    return res.data.jobs
+  }
+  catch(err){
+    console.log(err);
+  }
+
+}
 
 export default function StudentDashboard() {
   
@@ -8,39 +20,9 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     // Sample jobs (replace with API call)
-    setJobs([
-      {
-        id: 1,
-        company: "Tech Corp",
-        title: "Frontend Developer",
-        description: "Build responsive UI using React and Tailwind CSS.",
-        eligibleBranches: ["Computer Science", "IT", "Software Engineering"],
-        minCgpa: 7.0,
-        deadline: "2025-11-15",
-        location: "Bangalore, India",
-      },
-      {
-        id: 2,
-        company: "CodeLabs",
-        title: "Backend Developer",
-        description: "Work with Node.js and databases to build scalable backend.",
-        eligibleBranches: ["Computer Science", "Software Engineering"],
-        minCgpa: 7.5,
-        deadline: "2025-11-20",
-        location: "Hyderabad, India",
-      },
-      {
-        id: 3,
-        company: "DesignHub",
-        title: "UI/UX Designer",
-        description: "Design intuitive interfaces and user experiences for web apps.",
-        eligibleBranches: ["Design", "Computer Science", "IT"],
-        minCgpa: 6.5,
-        deadline: "2025-11-25",
-        location: "Remote",
-      },
-    ]);
 
+    fetchJobs()
+    .then(res=> setJobs(res));
     
     setNotifications([
       { id: 1, message: "Placement drive on 25th Nov", date: "2025-10-23" },

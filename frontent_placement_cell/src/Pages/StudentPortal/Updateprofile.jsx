@@ -2,11 +2,25 @@ import React from 'react'
 import InputField from '../../components/Form/InputField';
 import { useForm } from 'react-hook-form';
 import SubmitButton from '../../components/Form/SubmitButton';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+
+const editProfile = async(data)=>{
+  try{
+    const res = await axios.post("http://localhost:8000/student/update",data,{withCredentials : true});
+    console.log(res.data);
+  }
+  catch(err){
+    console.log(err);
+  }
+}
 
 const Updateprofile = () => {
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const {student} = location.state || {};
   const {
     register,
     handleSubmit,
@@ -14,19 +28,17 @@ const Updateprofile = () => {
   } = useForm();
 
   const onSubmit = (data) => {
+    editProfile(data);
     console.log("Login data:", data);
-  };
-
-  function handleClick() {
     navigate('/student/profile');
-  }
+  };
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold text-green-700">Update Profile</h1>
 
       <form
-        onSubmit={handleSubmit(onsubmit)}
+        onSubmit={handleSubmit(onSubmit)}
         className="bg-white shadow-md rounded-lg p-6 space-y-4"
       >
         <div className='flex justify-end items-center'>
@@ -38,8 +50,8 @@ const Updateprofile = () => {
           name="name"
           register={register}
           errors={errors}
-          placeholder="Enter your name"
-          validation={{ required: "Name is required" }}
+          placeholder={student.name}
+          
         />
 
         <InputField
@@ -47,64 +59,69 @@ const Updateprofile = () => {
           name="email"
           register={register}
           errors={errors}
-          placeholder="Enter your email"
-          validation={{ required: "Email is required" }} />
+          placeholder={student.email}
+          />
 
         <InputField
           label="Roll Number"
-          name="rollNumber"
+          name="rollno"
           register={register}
+    
           errors={errors}
-          placeholder="Enter your roll number"
-          validation={{ required: "Roll Number is required" }} />
+          placeholder={student.roll_number}
+         />
 
         <InputField
           label="CGPA"
           name="cgpa"
           register={register}
+  
           errors={errors}
-          placeholder="Enter your CGPA"
-          validation={{ required: "CGPA is required" }} />
+          placeholder={student.cgpa}
+          />
 
         <InputField
           label="Department"
           name="department"
+
           register={register}
           errors={errors}
-          placeholder="Enter your department"
-          validation={{ required: "Department is required" }} />
+          placeholder= {student.department}
+     />
 
         <InputField
           label="Branch"
           name="branch"
           register={register}
+      
           errors={errors}
-          placeholder="Enter your branch"
-          validation={{ required: "Branch is required" }} />
+          placeholder= {student.branch}
+        />
 
         <InputField
           label="Year of Study"
           name="yearOfStudy"
           register={register}
+     
           errors={errors}
-          placeholder="Enter your year of study"
-          validation={{ required: "Year of study is required" }} />
+          placeholder={student.year_of_study}
+  />
 
         <InputField
           label="Backlog Status"
-          name="backlogStatus"
+          name="backlog"
           register={register}
           errors={errors}
-          placeholder="Enter your backlog status"
-          validation={{ required: "backlog status is required" }} />
+          placeholder={student.backlog_status}
+        />
 
         <InputField
           label="Resume Link"
           name="resumeLink"
           register={register}
           errors={errors}
-          placeholder="Enter your resume link"
-          validation={{ required: "resume link is required" }} />
+          placeholder={student.resume_url}
+       />
 
         <SubmitButton>Update Profile</SubmitButton>
       </form>
