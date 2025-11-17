@@ -1,5 +1,20 @@
+import axios from 'axios';
 import React from 'react'
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import SubmitButton from '../Form/SubmitButton';
+
+const logout = async () => {
+  try {
+    const res = await axios.delete("http://localhost:8000/logout", {
+      withCredentials: true,
+    });
+    console.log(res.data);
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+  }
+};
+
 
 const Navbar = ({ links = [] }) => {
 
@@ -7,7 +22,27 @@ const Navbar = ({ links = [] }) => {
     
     const navigate = useNavigate();
 
+    const [login, setlogin] = useState({})
+
+    useEffect(() => {
+      async function isAuth() {
+        const res = await axios.get("http://localhost:8000/check-auth", {withCredentials: true})
+        console.log("f",res);
+        setlogin(res.data);
+
+      }
+
+      isAuth();
+    
+    }, [])
+    
+
     function handleClick() {
+        navigate('/');
+    }
+
+    async function handleLogout () {
+        await logout();
         navigate('/');
     }
 
@@ -42,12 +77,20 @@ const Navbar = ({ links = [] }) => {
 
             </div>
             <div className="flex gap-4">
-                <NavLink
+                {
+                    (login.userId && login.role)?  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 rounded-lg font-semibold text-green-700 border border-green-700 hover:bg-green-700 hover:text-white transition"
+                >
+                    Logout
+                </button>:<NavLink
                     to="/login"
                     className="px-4 py-2 rounded-lg font-semibold text-green-700 border border-green-700 hover:bg-green-700 hover:text-white transition"
                 >
                     Login
                 </NavLink>
+                }
+               
                 <NavLink
                     to="/signup"
                     className="px-4 py-2 rounded-lg font-semibold text-white bg-green-700 hover:bg-green-800 transition"

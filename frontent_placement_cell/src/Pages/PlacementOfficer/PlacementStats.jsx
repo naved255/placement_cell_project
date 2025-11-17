@@ -1,108 +1,99 @@
-import React, { useState } from "react";
-import {  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function PlacementStats() {
-  const [topStudents] = useState([
-    {
-      id: 1,
-      name: "Aman Sharma",
-      branch: "CSE",
-      company: "Google",
-      package: "45 LPA",
-    },
-    {
-      id: 2,
-      name: "Priya Mehta",
-      branch: "ECE",
-      company: "Qualcomm",
-      package: "38 LPA",
-    },
-    {
-      id: 3,
-      name: "Ravi Patel",
-      branch: "IT",
-      company: "Microsoft",
-      package: "42 LPA",
-    },
-  ]);
-
-  const [branchWisePlacements] = useState([
-    {
-      branch: "Computer Science Engineering (CSE)",
-      short: "CSE",
-      students: [
-        { name: "Aman Sharma", company: "Google", package: "45 LPA" },
-        { name: "Kritika Singh", company: "Amazon", package: "32 LPA" },
-        { name: "Rohit Verma", company: "TCS Digital", package: "12 LPA" },
-      ],
-    },
-    {
-      branch: "Electronics & Communication (ECE)",
-      short: "ECE",
-      students: [
-        { name: "Priya Mehta", company: "Qualcomm", package: "38 LPA" },
-        { name: "Saurabh Kumar", company: "Intel", package: "28 LPA" },
-      ],
-    },
-    {
-      branch: "Mechanical Engineering (ME)",
-      short: "ME",
-      students: [
-        { name: "Ravi Kumar", company: "Tata Motors", package: "10 LPA" },
-        { name: "Ankit Jain", company: "Mahindra", package: "8 LPA" },
-      ],
-    },
-  ]);
-
-  
-  const pieData = branchWisePlacements.map((branch) => ({
-    name: branch.short,
-    value: branch.students.length,
-  }));
+  const [topStudents, setTopStudents] = useState([]);
+  const [placements, setPlacements] = useState([]);
+  const [error, setError] = useState(null);
 
   const COLORS = ["#16a34a", "#22c55e", "#4ade80", "#86efac"];
 
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/placement/placement-stats", {
+          withCredentials: true,
+        });
+        console.log(res.data);
+
+        setTopStudents(res.data.topStudents || []);
+        setPlacements(res.data.placements || []);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+        setError(err.message);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // ✅ Group placements by branch
+  const branchMap = placements.reduce((acc, curr) => {
+    if (!acc[curr.branch]) acc[curr.branch] = [];
+    acc[curr.branch].push(curr);
+    return acc;
+  }, {});
+
+  const branchWisePlacements = Object.keys(branchMap).map((branch) => ({
+    branch,
+    students: branchMap[branch],
+  }));
+
+  // ✅ Pie chart data
+  const pieData = Object.keys(branchMap).map((branch) => ({
+    name: branch,
+    value: branchMap[branch].length,
+  }));
+
+  if (error) {
+    return <p className="text-center text-red-600 mt-10">⚠️ {error}</p>;
+  }
+
   return (
     <div className="min-h-screen bg-green-50 py-10 px-6 md:px-12">
-      
       <h1 className="text-3xl font-bold text-green-700 text-center mb-10">
         Placement Statistics
       </h1>
 
-
+      {/* 🏆 Top Students */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold text-green-700 mb-6">
           Highest Placed Students
         </h2>
 
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {topStudents.map((student) => (
-            <div
-              key={student.id}
-              className="bg-white shadow-md rounded-2xl p-6 border border-green-100 hover:shadow-lg transition"
-            >
-              <h3 className="text-xl font-semibold text-green-700">
-                {student.name}
-              </h3>
-              <p className="text-gray-700">{student.branch}</p>
-              <p className="text-gray-600 mt-1">
-                Company:{" "}
-                <span className="font-medium text-green-700">
-                  {student.company}
-                </span>
-              </p>
-              <p className="text-gray-600">
-                Package:{" "}
-                <span className="font-bold text-green-700">
-                  {student.package}
-                </span>
-              </p>
-            </div>
-          ))}
+          {topStudents.length > 0 ? (
+            topStudents.map((student, i) => (
+              <div
+                key={i}
+                className="bg-white shadow-md rounded-2xl p-6 border border-green-100 hover:shadow-lg transition"
+              >
+                <h3 className="text-xl font-semibold text-green-700">
+                  {student.name}
+                </h3>
+                <p className="text-gray-700">{student.branch}</p>
+                <p className="text-gray-600 mt-1">
+                  Company:{" "}
+                  <span className="font-medium text-green-700">
+                    {student.company}
+                  </span>
+                </p>
+                <p className="text-gray-600">
+                  Package:{" "}
+                  <span className="font-bold text-green-700">
+                    {student.package}
+                  </span>
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600 italic">No top students data.</p>
+          )}
         </div>
       </section>
 
-
+      {/* 🧑‍🎓 Branch-wise Placements */}
       <section className="mb-12">
         <h2 className="text-2xl font-semibold text-green-700 mb-6">
           Branch-wise Placements
@@ -124,6 +115,7 @@ export default function PlacementStats() {
                     <tr className="bg-green-100 text-green-700">
                       <th className="p-3 text-left">Student Name</th>
                       <th className="p-3 text-left">Company</th>
+                      <th className="p-3 text-left">Job Title</th>
                       <th className="p-3 text-left">Package</th>
                     </tr>
                   </thead>
@@ -133,10 +125,11 @@ export default function PlacementStats() {
                         key={idx}
                         className="border-b hover:bg-green-50 transition"
                       >
-                        <td className="p-3">{s.name}</td>
-                        <td className="p-3">{s.company}</td>
+                        <td className="p-3">{s.student_name}</td>
+                        <td className="p-3">{s.company_name}</td>
+                        <td className="p-3">{s.job_title}</td>
                         <td className="p-3 font-medium text-green-700">
-                          {s.package}
+                          {s.package_offered} LPA
                         </td>
                       </tr>
                     ))}
@@ -152,7 +145,7 @@ export default function PlacementStats() {
         </div>
       </section>
 
-      
+      {/* 📊 Pie Chart */}
       <section className="bg-white shadow-md rounded-2xl border border-green-100 p-8">
         <h2 className="text-2xl font-semibold text-green-700 mb-6 text-center">
           Placement Distribution by Branch

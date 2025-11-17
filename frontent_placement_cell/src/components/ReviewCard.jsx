@@ -7,6 +7,7 @@ export default function ReviewCard({
   status,
   onApprove,
   onReject,
+  onDelete,
   type = "job"
 }) {
   const statusColor =
@@ -41,7 +42,7 @@ export default function ReviewCard({
       </div>
 
       
-      {status.toLowerCase() === "pending" && (
+      {status.toLowerCase() === "pending" ? (
         <div className="flex justify-end gap-2">
           <button
             onClick={onApprove}
@@ -54,6 +55,15 @@ export default function ReviewCard({
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md"
           >
             Reject
+          </button>
+        </div>
+      ):(
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={onDelete}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md"
+          >
+            Remove
           </button>
         </div>
       )}

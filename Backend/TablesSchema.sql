@@ -1,127 +1,210 @@
 create database placement_cell_project;
 use placement_cell_project;
 
+CREATE TABLE users (
+  user_id varchar(250) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('student', 'company', 'officer') DEFAULT 'student'
+);
+
 CREATE TABLE students (
-    student_id INT PRIMARY KEY,
-    name VARCHAR(60) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(60) NOT NULL,
-    cgpa DECIMAL(3,2) CHECK (cgpa >= 0 AND cgpa <= 10),
-    department VARCHAR(30),
-    dob DATE,
-    address VARCHAR(500),
-    gender VARCHAR(10),
-    year_of_study INT CHECK (year_of_study BETWEEN 1 AND 4),
-    resume_link VARCHAR(255),
-    contact_no VARCHAR(10) CHECK (LENGTH(contact_no) = 10)
+  student_id varchar(250) PRIMARY KEY,
+  user_id varchar(250) ,
+  roll_number VARCHAR(50) UNIQUE,
+  branch ENUM("Computer Engineering", "Civil Engineering", "Mechanical Engineering", "Electrical Engineering", "Electronics Engineering"),
+  year_of_study VARCHAR(20),
+  department varchar(75),
+  cgpa DECIMAL(3,2),
+  resume_url TEXT,
+  backlog_status ENUM('none', 'active') DEFAULT 'none',
+  approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE companies (
-    company_id INT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    industry_type VARCHAR(100),
-    location VARCHAR(255),
-    website VARCHAR(255),
-    contact_person VARCHAR(100) NOT NULL,
-    contact_no VARCHAR(15) CHECK (LENGTH(contact_no) BETWEEN 10 AND 15),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  company_id varchar(250) PRIMARY KEY,
+  user_id varchar(250) ,
+  company_name VARCHAR(100),
+  description TEXT,
+  website TEXT,
+  contact_no VARCHAR(10),
+  contact_email VARCHAR(100),
+  approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 
 
 CREATE TABLE jobs (
-    job_id VARCHAR(60) PRIMARY KEY,
-    company_id VARCHAR(60) NOT NULL,
-    job_title VARCHAR(100) NOT NULL,
-    job_description TEXT,
-    salary_package DECIMAL(6,2) NOT NULL,
-    eligible_cgpa DECIMAL(3,2),
-    allowed_branches TEXT,
-    location VARCHAR(500),
-    application_deadline DATE NOT NULL,
-    FOREIGN KEY (company_id) REFERENCES companies(company_id)
-        ON UPDATE CASCADE ON DELETE CASCADE
+  job_id varchar(250) PRIMARY KEY,
+  company_id varchar(250),
+  title VARCHAR(100),
+  description TEXT,
+  min_cgpa DECIMAL(3,2),
+  allowed_branches VARCHAR(255), 
+  year_of_study VARCHAR(20),
+  salary_package VARCHAR(50),
+  location VARCHAR(100),
+  deadline DATE,
+  approval_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(company_id) ON DELETE CASCADE
 );
 
 CREATE TABLE applications (
-    application_id INT PRIMARY KEY AUTO_INCREMENT,
-    student_id VARCHAR(60) NOT NULL,
-    job_id VARCHAR(60) NOT NULL,
-    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(20) DEFAULT 'Pending',
-    FOREIGN KEY (student_id) REFERENCES students(student_id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (job_id) REFERENCES jobs(job_id)
-        ON UPDATE CASCADE ON DELETE CASCADE
+  application_id varchar(250) primary key,
+  student_id varchar(250),
+  job_id varchar(250),
+  applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('Applied', 'Shortlisted', 'Rejected', 'Hired') DEFAULT 'Applied',
+  eligibility_status ENUM('eligible', 'not_eligible') DEFAULT 'eligible',
+  FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+  FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE CASCADE
+);
+
+CREATE TABLE placements (
+  placement_id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id varchar(250),
+  company_id varchar(250),
+  job_id varchar(250),
+  package_offered VARCHAR(50),
+  placement_date DATE,
+  FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+  FOREIGN KEY (company_id) REFERENCES companies(company_id) ON DELETE CASCADE,
+  FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE CASCADE
 );
 
 
-CREATE TABLE branches (
-    branch_id INT NOT NULL AUTO_INCREMENT,
-    branch_name VARCHAR(100) NOT NULL UNIQUE,
-    PRIMARY KEY (branch_id)
+CREATE TABLE officer (
+    user_id varchar(250) primary key,
+    phone VARCHAR(15),
+    designation VARCHAR(50) DEFAULT 'Placement Officer',
+    department VARCHAR(100) DEFAULT 'Training and Placement Cell',
+    office_room_no VARCHAR(20),
+    profile_photo VARCHAR(255) DEFAULT 'default_officer.jpg',
+    joining_date DATE,
+    last_login TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE job_branches (
-    job_id VARCHAR(60) NOT NULL,
-    branch_id INT NOT NULL,
-    PRIMARY KEY (job_id, branch_id)
+
+CREATE TABLE notifications (
+  notification_id VARCHAR(250) PRIMARY KEY,
+  officer_id VARCHAR(250),
+  receiver ENUM('students', 'companies', 'both') NOT NULL,
+  title VARCHAR(200),
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_read BOOLEAN DEFAULT FALSE,
+
+  FOREIGN KEY (officer_id) REFERENCES officer(user_id)
+    ON UPDATE CASCADE 
+    ON DELETE CASCADE
 );
 
--- insertion code
-INSERT INTO students (student_id, name, email, password, cgpa, department, dob, address, gender, year_of_study, resume_link, contact_no) VALUES
-('S001', 'Alice Sharma', 'alice.sharma@example.com', 'pass123', 8.5, 'Computer Science', '2002-05-12', '123, MG Road, Delhi', 'Female', 3, 'resume_alice.pdf', '9876543210'),
-('S002', 'Rohan Verma', 'rohan.verma@example.com', 'pass234', 7.8, 'Electrical', '2001-11-20', '45, Park Street, Kolkata', 'Male', 4, 'resume_rohan.pdf', '9123456780'),
-('S003', 'Priya Singh', 'priya.singh@example.com', 'pass345', 9.1, 'Mechanical', '2003-01-15', '67, Ring Road, Jaipur', 'Female', 2, 'resume_priya.pdf', '9988776655'),
-('S004', 'Amit Kumar', 'amit.kumar@example.com', 'pass456', 8.0, 'Civil', '2002-09-10', '89, Main Street, Lucknow', 'Male', 3, 'resume_amit.pdf', '9876512340'),
-('S005', 'Sneha Joshi', 'sneha.joshi@example.com', 'pass567', 7.5, 'Computer Science', '2001-03-25', '12, Green Park, Delhi', 'Female', 4, 'resume_sneha.pdf', '9123498765'),
-('S006', 'Vikram Patel', 'vikram.patel@example.com', 'pass678', 8.3, 'Electrical', '2002-06-30', '34, MG Road, Ahmedabad', 'Male', 3, 'resume_vikram.pdf', '9876541230'),
-('S007', 'Anjali Mehra', 'anjali.mehra@example.com', 'pass789', 9.0, 'Mechanical', '2003-02-18', '56, Park Lane, Pune', 'Female', 2, 'resume_anjali.pdf', '9988771122'),
-('S008', 'Karan Malhotra', 'karan.malhotra@example.com', 'pass890', 7.9, 'Civil', '2001-08-05', '78, Church Road, Chennai', 'Male', 4, 'resume_karan.pdf', '9123459876'),
-('S009', 'Isha Gupta', 'isha.gupta@example.com', 'pass901', 8.7, 'Computer Science', '2002-12-22', '90, MG Road, Mumbai', 'Female', 3, 'resume_isha.pdf', '9876123450'),
-('S010', 'Rajat Reddy', 'rajat.reddy@example.com', 'pass012', 7.6, 'Electrical', '2003-04-10', '23, Park Avenue, Hyderabad', 'Male', 2, 'resume_rajat.pdf', '9123789456');
 
-INSERT INTO companies (company_id, name, email, password, industry_type, location, website, contact_person, contact_no) VALUES
-('C001', 'TechSolutions', 'contact@techsolutions.com', 'comp123', 'IT Services', 'Bangalore', 'https://techsolutions.com', 'Rahul Sharma', '9876543211'),
-('C002', 'BuildCorp', 'info@buildcorp.com', 'comp234', 'Construction', 'Mumbai', 'https://buildcorp.com', 'Anil Kumar', '9123456781'),
-('C003', 'AutoMakers', 'hr@automakers.com', 'comp345', 'Automobile', 'Pune', 'https://automakers.com', 'Priya Reddy', '9988776656'),
-('C004', 'GreenEnergy', 'careers@greenenergy.com', 'comp456', 'Energy', 'Delhi', 'https://greenenergy.com', 'Vikram Singh', '9876512341'),
-('C005', 'FinTech Solutions', 'jobs@fintech.com', 'comp567', 'Finance', 'Hyderabad', 'https://fintech.com', 'Sneha Kapoor', '9123498766');
 
-INSERT INTO branches (branch_name) VALUES
-('Computer Science'),
-('Electrical'),
-('Mechanical'),
-('Civil'),
-('Electronics');
+-- 1️⃣ Insert 25 users as students
+INSERT INTO users (user_id, name, email, password, role) VALUES
+(UUID(), 'Aman Sharma', 'aman.sharma@example.com', 'pass123', 'student'),
+(UUID(), 'Priya Mehta', 'priya.mehta@example.com', 'pass123', 'student'),
+(UUID(), 'Ravi Patel', 'ravi.patel@example.com', 'pass123', 'student'),
+(UUID(), 'Neha Singh', 'neha.singh@example.com', 'pass123', 'student'),
+(UUID(), 'Karan Verma', 'karan.verma@example.com', 'pass123', 'student'),
+(UUID(), 'Saurabh Kumar', 'saurabh.kumar@example.com', 'pass123', 'student'),
+(UUID(), 'Anjali Gupta', 'anjali.gupta@example.com', 'pass123', 'student'),
+(UUID(), 'Mohit Reddy', 'mohit.reddy@example.com', 'pass123', 'student'),
+(UUID(), 'Kritika Singh', 'kritika.singh@example.com', 'pass123', 'student'),
+(UUID(), 'Arjun Das', 'arjun.das@example.com', 'pass123', 'student'),
+(UUID(), 'Deepa Nair', 'deepa.nair@example.com', 'pass123', 'student'),
+(UUID(), 'Rahul Yadav', 'rahul.yadav@example.com', 'pass123', 'student'),
+(UUID(), 'Tanya Joshi', 'tanya.joshi@example.com', 'pass123', 'student'),
+(UUID(), 'Nikhil Bhatia', 'nikhil.bhatia@example.com', 'pass123', 'student'),
+(UUID(), 'Sneha Iyer', 'sneha.iyer@example.com', 'pass123', 'student'),
+(UUID(), 'Vikas Chauhan', 'vikas.chauhan@example.com', 'pass123', 'student'),
+(UUID(), 'Pooja Rani', 'pooja.rani@example.com', 'pass123', 'student'),
+(UUID(), 'Rohit Verma', 'rohit.verma@example.com', 'pass123', 'student'),
+(UUID(), 'Manish Tiwari', 'manish.tiwari@example.com', 'pass123', 'student'),
+(UUID(), 'Megha Kapoor', 'megha.kapoor@example.com', 'pass123', 'student'),
+(UUID(), 'Abhishek Rao', 'abhishek.rao@example.com', 'pass123', 'student'),
+(UUID(), 'Simran Kaur', 'simran.kaur@example.com', 'pass123', 'student'),
+(UUID(), 'Sanjay Pillai', 'sanjay.pillai@example.com', 'pass123', 'student'),
+(UUID(), 'Divya Nair', 'divya.nair@example.com', 'pass123', 'student'),
+(UUID(), 'Ankit Jain', 'ankit.jain@example.com', 'pass123', 'student');
 
-INSERT INTO jobs (job_id, company_id, job_title, job_description, salary_package, eligible_cgpa, location, application_deadline) VALUES
-('J001', 'C001', 'Software Engineer', 'Develop and maintain software applications.', 7.5, 7.5, 'Bangalore', '2025-11-30'),
-('J002', 'C002', 'Civil Engineer', 'Work on construction projects and site management.', 6.0, 7.0, 'Mumbai', '2025-12-15'),
-('J003', 'C003', 'Mechanical Engineer', 'Design and maintain mechanical systems.', 6.5, 7.2, 'Pune', '2025-11-25'),
-('J004', 'C004', 'Electrical Engineer', 'Work on energy systems and renewable projects.', 7.0, 7.5, 'Delhi', '2025-12-10'),
-('J005', 'C005', 'Data Analyst', 'Analyze financial data and provide insights.', 8.0, 8.0, 'Hyderabad', '2025-11-28');
+-- 2️⃣ Insert students (linking to user table)
+INSERT INTO students (student_id, user_id, roll_number, branch, year_of_study, department, cgpa, resume_url, backlog_status, approval_status)
+SELECT 
+UUID(), user_id, 
+CONCAT('CE', LPAD(ROW_NUMBER() OVER (), 3, '0')),
+ELT(FLOOR(1 + (RAND() * 5)), 'Computer Engineering', 'Civil Engineering', 'Mechanical Engineering', 'Electrical Engineering', 'Electronics Engineering'),
+ELT(FLOOR(1 + (RAND() * 4)), 'First', 'Second', 'Third', 'Final'),
+ELT(FLOOR(1 + (RAND() * 5)), 'CSE', 'CIV', 'ME', 'EEE', 'ECE'),
+ROUND(6.5 + (RAND() * 3), 2),
+'https://example.com/resume.pdf',
+'none',
+'approved'
+FROM users WHERE role = 'student';
+');
 
-INSERT INTO jobs_branches (job_id, branch_id) VALUES
-('J001', 1),  -- Computer Science
-('J001', 5),  -- Electronics
-('J002', 4),  -- Civil
-('J003', 3),  -- Mechanical
-('J004', 2),  -- Electrical
-('J004', 5),  -- Electronics
-('J005', 1),  -- Computer Science
-('J005', 2);  -- Electrical
+-- 1️⃣ Insert company users
+INSERT INTO users (user_id, name, email, password, role) VALUES
+(UUID(), 'Google India', 'hr@google.com', 'pass123', 'company'),
+(UUID(), 'Amazon Development Centre', 'hr@amazon.com', 'pass123', 'company'),
+(UUID(), 'Microsoft India', 'hr@microsoft.com', 'pass123', 'company'),
+(UUID(), 'TCS Digital', 'hr@tcs.com', 'pass123', 'company'),
+(UUID(), 'Infosys Ltd', 'hr@infosys.com', 'pass123', 'company'),
+(UUID(), 'Wipro Technologies', 'hr@wipro.com', 'pass123', 'company'),
+(UUID(), 'Tech Mahindra', 'hr@techm.com', 'pass123', 'company'),
+(UUID(), 'Accenture India', 'hr@accenture.com', 'pass123', 'company');
 
-INSERT INTO applications (student_id, job_id, status) VALUES
-('S001', 'J001', 'Pending'),
-('S002', 'J004', 'Pending'),
-('S003', 'J003', 'Pending'),
-('S004', 'J002', 'Pending'),
-('S005', 'J005', 'Pending'),
-('S006', 'J004', 'Pending'),
-('S007', 'J003', 'Pending'),
-('S008', 'J002', 'Pending'),
-('S009', 'J001', 'Pending'),
-('S010', 'J005', 'Pending');
+-- 2️⃣ Insert companies
+INSERT INTO companies (company_id, user_id, company_name, description, website, contact_no, contact_email, approval_status)
+SELECT 
+UUID(),
+user_id,
+name,
+CONCAT('Leading IT and Consulting firm: ', name),
+CONCAT('https://', LOWER(REPLACE(SUBSTRING_INDEX(name, ' ', 1), '.', '')), '.com'),
+'9876543210',
+email,
+'approved'
+FROM users WHERE role = 'company';
+
+
+INSERT INTO jobs (job_id, company_id, title, description, min_cgpa, allowed_branches, year_of_study, salary_package, location, deadline, approval_status)
+SELECT 
+UUID(),
+company_id,
+CONCAT('Software Engineer - ', company_name),
+'Exciting role for freshers',
+ROUND(6.5 + RAND()*2, 2),
+'Computer Engineering, Electronics Engineering, Electrical Engineering',
+'Final',
+CONCAT(ROUND(5 + RAND()*20, 2), ' LPA'),
+'Bangalore',
+DATE_ADD(CURDATE(), INTERVAL 30 DAY),
+'approved'
+FROM companies;
+
+
+INSERT INTO placements (student_id, company_id, job_id, package_offered, placement_date)
+SELECT 
+s.student_id,
+j.company_id,
+j.job_id,
+CONCAT(ROUND(5 + RAND()*20, 2), ' LPA'),
+DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND()*180) DAY)
+FROM students s
+JOIN jobs j ON RAND() < 0.3
+LIMIT 20;
+
+
+
+
+
+
+
+

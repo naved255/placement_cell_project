@@ -3,41 +3,60 @@ import { useLocation, useNavigate } from "react-router-dom";
 import InputField from "../../components/Form/InputField";
 import SelectField from "../../components/Form/SelectedField";
 import SubmitButton from "../../components/Form/SubmitButton";
-import axios from "axios";
+import axios from 'axios'
 
 
 
 const RoleRegisteration = () => {
-  
-const handleCompanyRegister = async (data) => {
-  try {
-    const res = await axios.post("http://localhost:8000/register/company", {
-      CompanyName: data.companyName,
-      description: data.description,
-      contactNo: data.contactNumber,
-      contactEmail: data.contactEmail,
-      website: data.websiteLink
-    }, { withCredentials: true })
-    console.log(res.data);
-    navigate("/company");
-    return;
-  }
-  catch (err) {
-    if (err.response.status === 400 || err.response.status == 404) {
-      console.log(err.response.data);
+
+  const handleStudentRegister = async (data) => {
+    try {
+      const res = await axios.post("http://localhost:8000/register/student", {
+        rollno: data.rollno,
+        cgpa: data.cgpa,
+        branch: data.branch,
+        department: data.department,
+        backlog: data.backlog,
+        yearOfStudy: data.yearOfStudy,
+      }, { withCredentials: true })
+      console.log(res.data);
+
+      navigate("/student");
+      return;
+    } catch (err) {
+      console.log("student registration error:", err);
     }
   }
-}
 
-const handleOfficerRegister = async(data)=>{
-  try{
-    const res = await axios.post("http://localhost:8000/register/officer",data,{withCredentials : true})
-    console.log(res.data);
+  const handleCompanyRegister = async (data) => {
+    try {
+      const res = await axios.post("http://localhost:8000/register/company", {
+        CompanyName: data.companyName,
+        description: data.description,
+        contactNo: data.contactNumber,
+        contactEmail: data.contactEmail,
+        website: data.websiteLink
+      }, { withCredentials: true })
+      console.log(res.data);
+      navigate("/company");
+      return;
+    }
+    catch (err) {
+
+      console.log(err.response.data);
+
+    }
   }
-  catch(err){
-    console.log(err.message);
+
+  const handleOfficerRegister = async (data) => {
+    try {
+      const res = await axios.post("http://localhost:8000/register/officer", data, { withCredentials: true })
+      navigate("/officer");
+    }
+    catch (err) {
+      console.log(err.message);
+    }
   }
-}
   const navigate = useNavigate();
   const location = useLocation();
   const { register, watch, handleSubmit, formState: { errors } } = useForm();
@@ -54,7 +73,7 @@ const handleOfficerRegister = async(data)=>{
     }
   };
   const { role } = location.state;
-
+  console.log(role);
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-50 px-4">
       <form
@@ -68,7 +87,7 @@ const handleOfficerRegister = async(data)=>{
               <h3 className="text-green-600 font-semibold mb-2">Student Info</h3>
               <InputField
                 label="Roll Number"
-                name="rollNumber"
+                name="rollno"
                 register={register}
                 errors={errors}
                 placeholder="Enter your university roll number"
@@ -95,6 +114,16 @@ const handleOfficerRegister = async(data)=>{
                 placeholder="Enter your branch"
                 {...register("branch", { required: "Branch is required" })}
               />
+
+              <SelectField
+                label="Branch"
+                name="branch"
+                register={register}
+                errors={errors}
+                placeholder="Enter your branch"
+                options={["Computer Engineering", "Civil Engineering", "Mechanical Engineering", "Electrical Engineering", "Electronics Engineering"]}
+                {...register("branch", { required: "Branch is required" })}
+              />
               <InputField
                 label="Resume Link"
                 name="resumeLink"
@@ -106,7 +135,7 @@ const handleOfficerRegister = async(data)=>{
 
               <SelectField
                 label={"Backlock status"}
-                name={"backlockStatus"}
+                name={"backlog"}
                 register={register}
                 errors={errors}
                 options={["No backlock", "backlock present"]}
@@ -167,7 +196,7 @@ const handleOfficerRegister = async(data)=>{
                 register={register}
                 errors={errors}
                 placeholder="Enter contact number"
-                validation={{ required: "Contact Number is required" }}
+                validation={{ required: "Contact Number is required", maxLength: { value: 10, message: "Phone number cannot be greater than 10 digits" }, minLength: { value: 10, message: "Phone number cannot be samller than 10 digits" } }}
 
               />
             </div>

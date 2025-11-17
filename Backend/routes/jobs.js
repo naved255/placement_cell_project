@@ -9,4 +9,5 @@ router.get("/company",authenticateToken,authorizeRole("company"),getJobByCompany
 router.post("/postJob",authenticateToken,authorizeRole("company"),addNewJob);
 router.post("/update/status/:id",authenticateToken,authorizeRole("officer"),updateStatus)
 
+
 export default  router;

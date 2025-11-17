@@ -1,152 +1,189 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import InputField from "../../components/Form/InputField";
-import SelectField from "../../components/Form/SelectedField";
+import Select from "react-select";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const addJobPost = async(data)=>{
-    try{
-        const res = await axios.post("http://localhost:8000/job/postJob",data,{withCredentials:true});
-        console.log(res.data);
-
-    }
-    catch(err){
-        console.log(err);
-    }
-}
+const addJobPost = async (data) => {
+  try {
+    const res = await axios.post("http://localhost:8000/job/postJob", data, { withCredentials: true });
+    console.log(res.data);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 const JobPost = () => {
-    const [allowedBranches , setAllowedBranches] = useState([])
-    const handlesBranches = (data)=>{
-        console.log(data);
-    }
+  const navigate = useNavigate();
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm();
+  // Define branch options
+  const branchOptions = [
+    { value: "Computer Engineering", label: "Computer Engineering" },
+    { value: "Civil Engineering", label: "Civil Engineering" },
+    { value: "Mechanical Engineering", label: "Mechanical Engineering" },
+    { value: "Electrical Engineering", label: "Electrical Engineering" },
+    { value: "Electronics Engineering", label: "Electronics Engineering" },
+  ];
 
-    const onSubmit = (data) => {
-        console.log("Job Posted:", data);
-        addJobPost(data);
-        alert("✅ Job Posted Successfully!");
-        reset();
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm();
+
+  const onSubmit = (data) => {
+    // Convert selected branches from objects to string array
+    console.log(data);
+    const formattedData = {
+      ...data,
+      allowedBranches: data.allowedBranches.map((b) => b.value),
     };
 
-    return (
-        <div className="max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-8">
-            <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">
-                Post a New Job
-            </h2>
+    console.log("Job Posted:", formattedData);
+    addJobPost(formattedData);
+    navigate("/company");
+    reset();
+  };
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+  return (
+    <div className="max-w-3xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-8">
+      <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">
+        Post a New Job
+      </h2>
 
-                <InputField
-                    label="Job Title"
-                    name="jobTitle"
-                    register={register}
-                    errors={errors}
-                    validation={{ required: "Title is required" }}
-                    placeholder="Enter job title"
-                />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-             
-                <div>
-                    <label className="block text-gray-700 font-semibold mb-2">
-                        Job Description
-                    </label>
-                    <textarea
-                        {...register("description", {
-                            required: "Job description is required",
-                            minLength: {
-                                value: 10,
-                                message: "Minimum 10 characters required",
-                            },
-                        })}
-                        rows="4"
-                        placeholder="Enter detailed job description"
-                        className="w-full p-3 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-                    ></textarea>
-                    {errors.description && (
-                        <p className="text-red-500 text-sm mt-1">
-                            {errors.description.message}
-                        </p>
-                    )}
-                </div>
+        {/* Job Title */}
+        <InputField
+          label="Job Title"
+          name="jobTitle"
+          register={register}
+          errors={errors}
+          validation={{
+            required: "Title is required",
+            maxLength: {
+              value: 30,
+              message: "Title must contain a maximum of 30 characters",
+            },
+          }}
+          placeholder="Enter job title"
+        />
 
-              
-                <SelectField
-                    label={"Eligible Branches"}
-                    name={"allowedBranches"}
-                    register={register}
-                    onChange={(e)=>handlesBranches(e.target.value)}
-                    errors={errors}
-                    validation={{ required: "Email is required" }}
-                    options={["Computer Engineering", "Civil Engineering", "Mechanical Engineering", "Electical Engineering", "Electronics Engineering"]}
-                />
-
-              
-                <InputField
-                    label="Minimum CGPA"
-                    name="minGpa"
-                    type="number"
-                    step="0.1"
-                    register={register}
-                    errors={errors}
-                    validation={{ required: "Email is required" }}
-                    placeholder="e.g. 7.5"
-                />
-                                <InputField
-                    label="Year of Study"
-                    name="yearOfStudy"
-                    type="number"
-                    register={register}
-                    errors={errors}
-                    validation={{ required: "Email is required" }}
-
-                />
-
-              
-                <InputField
-                    label="Application Deadline"
-                    name="deadline"
-                    type="date"
-                    register={register}
-                    errors={errors}
-                    validation={{ required: "Email is required" }}
-                />
-
-                {/* Location */}
-                <InputField
-                    label="Location"
-                    name="location"
-                    register={register}
-                    errors={errors}
-                    validation={{ required: "Email is required" }}
-                    placeholder="e.g. Bengaluru, Remote"
-                />
-                                <InputField
-                    label="Salary Package"
-                    name="salary"
-                    register={register}
-                    errors={errors}
-                    validation={{ required: "Email is required" }}
-                />
-
-                {/* Submit Button */}
-                <div className="text-center">
-                    <button
-                        type="submit"
-                        className="bg-green-700 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-800 transition"
-                    >
-                        Post Job
-                    </button>
-                </div>
-            </form>
+        {/* Job Description */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            Job Description
+          </label>
+          <textarea
+            {...register("description", {
+              required: "Job description is required",
+              minLength: { value: 10, message: "Minimum 10 characters required" },
+            })}
+            rows="4"
+            placeholder="Enter detailed job description"
+            className="w-full p-3 border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+          ></textarea>
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description.message}
+            </p>
+          )}
         </div>
-    );
+
+        {/* Eligible Branches (Multi Select) */}
+        <div>
+          <label className="font-semibold text-gray-700">Eligible Branches</label>
+          <Controller
+            name="allowedBranches"
+            control={control}
+            rules={{ required: "Please select at least one branch" }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                isMulti
+                options={branchOptions}
+                className="mt-2"
+                placeholder="Select eligible branches"
+              />
+            )}
+          />
+          {errors.allowedBranches && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.allowedBranches.message}
+            </p>
+          )}
+        </div>
+
+        {/* Other Input Fields */}
+        <InputField
+          label="Minimum CGPA"
+          name="minGpa"
+          type="number"
+          step="0.1"
+          register={register}
+          errors={errors}
+          validation={{
+            required: "CGPA is required",
+            min: { value: 0, message: "Minimum CGPA is 0" },
+            max: { value: 10, message: "Maximum CGPA is 10" },
+          }}
+          placeholder="e.g. 7.5"
+        />
+
+        <InputField
+          label="Year of Study"
+          name="yearOfStudy"
+          type="number"
+          register={register}
+          errors={errors}
+          validation={{
+            required: "Year of study is required",
+            min: { value: 1, message: "Minimum year of study is 1" },
+            max: { value: 4, message: "Maximum year of study is 4" },
+          }}
+        />
+
+        <InputField
+          label="Application Deadline"
+          name="deadline"
+          type="date"
+          register={register}
+          errors={errors}
+          validation={{ required: "Application Deadline is required" }}
+        />
+
+        <InputField
+          label="Location"
+          name="location"
+          register={register}
+          errors={errors}
+          validation={{ required: "Location is required" }}
+          placeholder="e.g. Bengaluru, Remote"
+        />
+
+        <InputField
+          label="Salary Package"
+          name="salary"
+          register={register}
+          errors={errors}
+          validation={{ required: "Salary Package is required" }}
+        />
+
+        {/* Submit Button */}
+        <div className="text-center">
+          <button
+            type="submit"
+            className="bg-green-700 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-800 transition"
+          >
+            Post Job
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 };
 
 export default JobPost;

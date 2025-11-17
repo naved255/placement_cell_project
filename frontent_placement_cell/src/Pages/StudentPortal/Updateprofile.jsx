@@ -3,15 +3,18 @@ import InputField from '../../components/Form/InputField';
 import { useForm } from 'react-hook-form';
 import SubmitButton from '../../components/Form/SubmitButton';
 import { useLocation, useNavigate } from 'react-router-dom';
+import SelectField from '../../components/Form/SelectedField';
 import axios from 'axios';
 
 
-const editProfile = async(data)=>{
-  try{
-    const res = await axios.post("http://localhost:8000/student/update",data,{withCredentials : true});
+const editProfile = async (data) => {
+
+
+  try {
+    const res = await axios.post("http://localhost:8000/student/update", data, { withCredentials: true });
     console.log(res.data);
   }
-  catch(err){
+  catch (err) {
     console.log(err);
   }
 }
@@ -20,7 +23,7 @@ const Updateprofile = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const {student} = location.state || {};
+  const { student } = location.state || {};
   const {
     register,
     handleSubmit,
@@ -32,6 +35,11 @@ const Updateprofile = () => {
     console.log("Login data:", data);
     navigate('/student/profile');
   };
+
+  const handleClick = () => {
+
+    navigate('/student/profile');
+  }
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -51,7 +59,7 @@ const Updateprofile = () => {
           register={register}
           errors={errors}
           placeholder={student.name}
-          
+
         />
 
         <InputField
@@ -60,25 +68,25 @@ const Updateprofile = () => {
           register={register}
           errors={errors}
           placeholder={student.email}
-          />
+        />
 
         <InputField
           label="Roll Number"
           name="rollno"
           register={register}
-    
+
           errors={errors}
           placeholder={student.roll_number}
-         />
+        />
 
         <InputField
           label="CGPA"
           name="cgpa"
           register={register}
-  
+
           errors={errors}
           placeholder={student.cgpa}
-          />
+        />
 
         <InputField
           label="Department"
@@ -86,26 +94,29 @@ const Updateprofile = () => {
 
           register={register}
           errors={errors}
-          placeholder= {student.department}
-     />
+          placeholder={student.department}
+        />
 
-        <InputField
+        <SelectField
           label="Branch"
           name="branch"
           register={register}
-      
           errors={errors}
-          placeholder= {student.branch}
+          placeholder="Enter your branch"
+          options={["Computer Engineering", "Civil Engineering", "Mechanical Engineering", "Electrical Engineering", "Electronics Engineering"]}
+
+          {...register("branch", { required: "Branch is required" })}
+
         />
 
         <InputField
           label="Year of Study"
           name="yearOfStudy"
           register={register}
-     
+
           errors={errors}
           placeholder={student.year_of_study}
-  />
+        />
 
         <InputField
           label="Backlog Status"
@@ -121,7 +132,7 @@ const Updateprofile = () => {
           register={register}
           errors={errors}
           placeholder={student.resume_url}
-       />
+        />
 
         <SubmitButton>Update Profile</SubmitButton>
       </form>

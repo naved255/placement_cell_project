@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { checkProfile, companyRegister, login, officerRegister, registerUser, studentRegister } from "../controller/authentication.js";
+import { checkProfile, companyRegister, login, logout, officerRegister, registerUser, studentRegister } from "../controller/authentication.js";
 import { authenticateToken, authorizeRole } from "../middleware.js";
 
 
@@ -10,6 +10,7 @@ router.get("/check/profile",authenticateToken,checkProfile)
 router.post("/register/company",authenticateToken,authorizeRole("company"),companyRegister);
 router.post("/register/officer",authenticateToken,authorizeRole("officer"),officerRegister)
 router.post("/login",login);
+router.delete("/logout",logout);
 
 
 export default router;

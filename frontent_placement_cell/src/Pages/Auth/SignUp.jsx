@@ -15,6 +15,7 @@ export default function SignupPage() {
 
     const onSubmit = async (data) => {
         try {
+
             const res = await axios.post("http://localhost:8000/register", {
                 name: data.name,
                 email: data.email,
@@ -22,18 +23,28 @@ export default function SignupPage() {
                 role: data.role,
 
             })
-            if (res.status == 400) {
-                console.log("User already exist ")
-                return ;
-            }
-            console.log("User registeration is completed");
+
+            console.log("User registration completed");
+            alert(res.data.message);
             navigate("/login");
-            
+
         }
         catch (err) {
-            throw err
+            if (err.response) {
+
+                alert(err.response.data.message || "Something went wrong!");
+                console.error("Backend error:", err.response.data);
+            } else if (err.request) {
+
+                alert("No response from server. Please try again.");
+                console.error("Request error:", err.request);
+            } else {
+
+                alert("An unexpected error occurred.");
+                console.error("Unexpected error:", err.message);
+            }
         }
-        
+
     };
 
 
